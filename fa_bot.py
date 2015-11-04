@@ -4,7 +4,6 @@ from config_manager import ConfigManager
 from discord_client import main_client
 from event_manager import event_manager
 import game_servers
-from variables_manager import variables_manager
 
 
 class FAbot(object):
