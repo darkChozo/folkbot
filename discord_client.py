@@ -3,7 +3,7 @@ import logging
 import discord
 from commands import commandregex, commands
 from event_manager import event_manager
-from variables_manager import variables_manager
+from message_variables import get_variables
 
 
 class Client(discord.Client):
@@ -41,20 +41,20 @@ def on_message(message):
         if cmdline.group('command') in commands:
             msg = commands[cmdline.group('command')](message, cmdline.group('args'))
             if msg is not None:
-                variables = variables_manager.get_variables(client=main_client, message=message)
+                variables = get_variables(client=main_client, message=message)
                 main_client.send_message(message.channel, msg.format(**variables))
 
 
 @main_client.event
 def on_member_join(server, member):
     if main_client.welcome_pm:
-        variables = variables_manager.get_variables(client=main_client, member=member)
+        variables = get_variables(client=main_client, member=member)
         main_client.send_message(member, main_client.welcome_pm.format(**variables))
     if main_client.join_announcement:
         for channel_number in main_client.announcement_channels:
             channel = main_client.get_channel(channel_number)
             if channel.server.id == server.id:
-                variables = variables_manager.get_variables(channel=channel, client=main_client, member=member)
+                variables = get_variables(channel=channel, client=main_client, member=member)
                 main_client.send_message(channel, main_client.join_announcement.format(**variables))
 
 
@@ -64,5 +64,5 @@ def on_member_remove(server, member):
         for channel_number in main_client.announcement_channels:
             channel = main_client.get_channel(channel_number)
             if channel.server.id == server.id:
-                variables = variables_manager.get_variables(channel=channel, client=main_client, member=member)
+                variables = get_variables(channel=channel, client=main_client, member=member)
                 main_client.send_message(channel, main_client.leave_announcement.format(**variables))
