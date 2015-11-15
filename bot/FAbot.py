@@ -6,6 +6,8 @@ import config_manager
 import event_manager
 import game_server
 import watcher
+import os.path
+import subprocess
 
 
 def command(cmd):
@@ -73,6 +75,9 @@ class FAbot(object):
 
         self.discordClient.channel_whitelist = self.config.get_json("channel_whitelist", default=[])
         self.discordClient.announcement_channels = self.config.get_json("announcement_channels", default=[])
+        print self.config.get_json("announcement_channels", default=[])
+        print self.discordClient.announcement_channels
+
 
         self.discordClient.welcome_pm = self.config.get("welcome_pm", section="Announcements")
         self.discordClient.join_announcement = self.config.get("join_announcement", section="Announcements")
@@ -268,3 +273,23 @@ class FAbot(object):
         logging.info('test()')
         msg = self.game_servers['arma'].raw_info() + '\n\n' + self.game_servers['insurgency'].raw_info()
         return msg
+
+    @command('update')
+    def update(self, message, args):
+        # """!update : tell the bot to get its latest release from github and restart. Permission required."""
+        if message is None:
+            return None
+
+        try:
+            git_result = subprocess.check_output('git pull', shell=True)
+            logging.info(git_result)
+            msg = ' '.join(("**Restarting for update:**\n```", git_result, "```"))
+            self.discordClient.announce(msg)
+            open('update','w').close()
+            self.stop()
+        except subprocess.CalledProcessError as err:
+            logging.info(err)
+            logging.info(' '.join(('shell: ', err.cmd)))
+            logging.info(' '.join(('output:', err.output)))
+            msg = ' '.join(('**Update failed:** ',str(err)))
+            return msg
