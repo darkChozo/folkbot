@@ -33,7 +33,7 @@ class FAbot(object):
         self.botMethods = ['start', 'stop']
 
         # Logging
-        logging.basicConfig(filename="logs/FA_bot.log", level=logging.DEBUG,
+        logging.basicConfig(filename="log/FA_bot.log", level=logging.DEBUG,
                             format="%(asctime)-15s %(message)s")
         logging.info("FAbot starting up")
         logging.info("Registering commands: ")
